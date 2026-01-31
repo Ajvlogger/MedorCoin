@@ -5,33 +5,34 @@ pragma solidity ^0.8.31;
     MedorCoin (MEDOR)
     - Fixed supply: 21,000,000
     - No owner
-    - No minting
+    - No minting after deployment
     - No taxes
-    - No pausing
-    - No blacklist / whitelist
-    - No proxy
-    - No external calls
     - Immutable after deployment
 */
 
-contract ERC20 {
-    string public name;
-    string public symbol;
+contract MedorCoin {
+    string public name = "MedorCoin";
+    string public symbol = "MEDOR";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
 
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
+    // Events
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
-    constructor(string memory _name, string memory _symbol) {
-        name = _name;
-        symbol = _symbol;
+    // Constructor: mint fixed supply to deployer
+    constructor() {
+        uint256 initialSupply = 21_000_000 * 10 ** decimals;
+        totalSupply = initialSupply;
+        balanceOf[msg.sender] = initialSupply;
+        emit Transfer(address(0), msg.sender, initialSupply);
     }
 
-    function transfer(address to, uint256 amount) external returns (bool) {
+    // Transfer tokens
+    function transfer(address to, uint256 amount) public returns (bool) {
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
         balanceOf[msg.sender] -= amount;
         balanceOf[to] += amount;
@@ -39,13 +40,15 @@ contract ERC20 {
         return true;
     }
 
-    function approve(address spender, uint256 amount) external returns (bool) {
+    // Approve spender
+    function approve(address spender, uint256 amount) public returns (bool) {
         allowance[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+    // Transfer tokens from another account
+    function transferFrom(address from, address to, uint256 amount) public returns (bool) {
         require(balanceOf[from] >= amount, "Insufficient balance");
         require(allowance[from][msg.sender] >= amount, "Allowance exceeded");
         allowance[from][msg.sender] -= amount;
@@ -53,17 +56,5 @@ contract ERC20 {
         balanceOf[to] += amount;
         emit Transfer(from, to, amount);
         return true;
-    }
-
-    function _mint(address to, uint256 amount) internal {
-        totalSupply += amount;
-        balanceOf[to] += amount;
-        emit Transfer(address(0), to, amount);
-    }
-}
-
-contract MedorCoin is ERC20 {
-    constructor() ERC20("MedorCoin", "MEDOR") {
-        _mint(msg.sender, 21_000_000 * 10 ** decimals);
     }
 }
