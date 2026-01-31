@@ -1,19 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.31;
 
-/*
-    MedorCoin (MEDOR)
-    - Fixed supply: 21,000,000
-    - No owner
-    - No minting after deployment
-    - No taxes
-    - Immutable after deployment
-*/
-
 contract MedorCoin {
-    string public constant name = "MedorCoin";
-    string public constant symbol = "MEDOR";
-    uint8 public constant decimals = 18;
+    string public constant NAME = "MedorCoin";
+    string public constant SYMBOL = "MEDOR";
+    uint8 public constant DECIMALS = 18;
     uint256 public totalSupply;
 
     mapping(address => uint256) public balanceOf;
@@ -22,16 +13,20 @@ contract MedorCoin {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
+    error ZeroAddress();
+    error InsufficientBalance();
+    error AllowanceExceeded();
+
     constructor() {
-        uint256 initialSupply = 21_000_000 * 10 ** uint256(decimals);
+        uint256 initialSupply = 21_000_000 * 10 ** DECIMALS;
         balanceOf[msg.sender] = initialSupply;
         totalSupply = initialSupply;
         emit Transfer(address(0), msg.sender, initialSupply);
     }
 
     function transfer(address to, uint256 amount) public returns (bool) {
-        require(to != address(0), "Cannot transfer to zero address");
-        require(balanceOf[msg.sender] >= amount, "Insufficient balance");
+        if (to == address(0)) revert ZeroAddress();
+        if (balanceOf[msg.sender] < amount) revert InsufficientBalance();
 
         unchecked {
             balanceOf[msg.sender] -= amount;
@@ -43,7 +38,7 @@ contract MedorCoin {
     }
 
     function approve(address spender, uint256 amount) public returns (bool) {
-        require(spender != address(0), "Cannot approve zero address");
+        if (spender == address(0)) revert ZeroAddress();
 
         allowance[msg.sender][spender] = amount;
         emit Approval(msg.sender, spender, amount);
@@ -51,9 +46,9 @@ contract MedorCoin {
     }
 
     function transferFrom(address from, address to, uint256 amount) public returns (bool) {
-        require(to != address(0), "Cannot transfer to zero address");
-        require(balanceOf[from] >= amount, "Insufficient balance");
-        require(allowance[from][msg.sender] >= amount, "Allowance exceeded");
+        if (to == address(0)) revert ZeroAddress();
+        if (balanceOf[from] < amount) revert InsufficientBalance();
+        if (allowance[from][msg.sender] < amount) revert AllowanceExceeded();
 
         unchecked {
             balanceOf[from] -= amount;
