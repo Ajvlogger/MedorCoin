@@ -1,10 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.31;
 
-contract MedorCoin {
+/*
+    MedorCoin (MEDOR)
+    - Fixed supply: 21,000,000
+    - No owner
+    - No minting after deployment
+    - No taxes
+    - Immutable after deployment
+*/
 
-    string public name = "MedorCoin";
-    string public symbol = "MEDOR";
+contract MedorCoin {
+    string public constant name = "MedorCoin";
+    string public constant symbol = "MEDOR";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
 
@@ -15,7 +23,7 @@ contract MedorCoin {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     constructor() {
-        uint256 initialSupply = 21000000 * 10 ** uint256(decimals);
+        uint256 initialSupply = 21_000_000 * 10 ** uint256(decimals);
         balanceOf[msg.sender] = initialSupply;
         totalSupply = initialSupply;
         emit Transfer(address(0), msg.sender, initialSupply);
@@ -25,8 +33,10 @@ contract MedorCoin {
         require(to != address(0), "Cannot transfer to zero address");
         require(balanceOf[msg.sender] >= amount, "Insufficient balance");
 
-        balanceOf[msg.sender] -= amount;
-        balanceOf[to] += amount;
+        unchecked {
+            balanceOf[msg.sender] -= amount;
+            balanceOf[to] += amount;
+        }
 
         emit Transfer(msg.sender, to, amount);
         return true;
@@ -45,9 +55,11 @@ contract MedorCoin {
         require(balanceOf[from] >= amount, "Insufficient balance");
         require(allowance[from][msg.sender] >= amount, "Allowance exceeded");
 
-        balanceOf[from] -= amount;
-        balanceOf[to] += amount;
-        allowance[from][msg.sender] -= amount;
+        unchecked {
+            balanceOf[from] -= amount;
+            balanceOf[to] += amount;
+            allowance[from][msg.sender] -= amount;
+        }
 
         emit Transfer(from, to, amount);
         return true;
