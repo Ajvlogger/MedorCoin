@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.31;
+pragma solidity ^0.8.3;
 
 contract MedorCoin {
 
@@ -16,8 +16,8 @@ contract MedorCoin {
     error InsufficientBalance();
     error AllowanceExceeded();
 
-    constructor() public {
-        uint256 initialSupply = 21_000_000 * 10 ** DECIMALS;
+    constructor() {
+        uint256 initialSupply = 3_000_000 * 10 ** DECIMALS;
         balanceOf[msg.sender] = initialSupply;
         totalSupply = initialSupply;
         emit Transfer(address(0), msg.sender, initialSupply);
