@@ -1,73 +1,11 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.31;
+You defined NAME and SYMBOL twice in two different ways.
 
-contract MedorCoin {
+You have these constants:
+	•	bytes32 public constant NAME
+	•	bytes32 public constant SYMBOL
 
-    uint8 public constant DECIMALS = 18;
-    uint256 public totalSupply;
+And you also have these functions:
+	•	function name()
+	•	function symbol()
 
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
-
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-
-    error ZeroAddress();
-    error InsufficientBalance();
-    error AllowanceExceeded();
-
-    constructor() {
-        uint256 initialSupply = 21_000_000 * 10 ** DECIMALS;
-        balanceOf[msg.sender] = initialSupply;
-        totalSupply = initialSupply;
-        emit Transfer(address(0), msg.sender, initialSupply);
-    }
-
-    function name() public pure returns (string memory) {
-        return "MedorCoin";
-    }
-
-    function symbol() public pure returns (string memory) {
-        return "MEDOR";
-    }
-
-    function decimals() public pure returns (uint8) {
-        return DECIMALS;
-    }
-
-    function transfer(address to, uint256 amount) public returns (bool) {
-        if (to == address(0)) revert ZeroAddress();
-        if (balanceOf[msg.sender] < amount) revert InsufficientBalance();
-
-        unchecked {
-            balanceOf[msg.sender] -= amount;
-            balanceOf[to] += amount;
-        }
-
-        emit Transfer(msg.sender, to, amount);
-        return true;
-    }
-
-    function approve(address spender, uint256 amount) public returns (bool) {
-        if (spender == address(0)) revert ZeroAddress();
-
-        allowance[msg.sender][spender] = amount;
-        emit Approval(msg.sender, spender, amount);
-        return true;
-    }
-
-    function transferFrom(address from, address to, uint256 amount) public returns (bool) {
-        if (to == address(0)) revert ZeroAddress();
-        if (balanceOf[from] < amount) revert InsufficientBalance();
-        if (allowance[from][msg.sender] < amount) revert AllowanceExceeded();
-
-        unchecked {
-            balanceOf[from] -= amount;
-            balanceOf[to] += amount;
-            allowance[from][msg.sender] -= amount;
-        }
-
-        emit Transfer(from, to, amount);
-        return true;
-    }
-}
+This is not valid ERC20 design. Wallets, explorers, and Remix expect one source of truth, not both.
