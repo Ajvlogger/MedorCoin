@@ -3,8 +3,6 @@ pragma solidity ^0.8.31;
 
 contract MedorCoin {
 
-    bytes32 public constant NAME = "MedorCoin";
-    bytes32 public constant SYMBOL = "MEDOR";
     uint8 public constant DECIMALS = 18;
     uint256 public totalSupply;
 
@@ -31,6 +29,10 @@ contract MedorCoin {
 
     function symbol() public pure returns (string memory) {
         return "MEDOR";
+    }
+
+    function decimals() public pure returns (uint8) {
+        return DECIMALS;
     }
 
     function transfer(address to, uint256 amount) public returns (bool) {
