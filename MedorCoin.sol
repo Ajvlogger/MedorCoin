@@ -16,26 +16,26 @@ contract MedorCoin {
     error InsufficientBalance();
     error AllowanceExceeded();
 
-    constructor() {
+    constructor() public {
         uint256 initialSupply = 21_000_000 * 10 ** DECIMALS;
         balanceOf[msg.sender] = initialSupply;
         totalSupply = initialSupply;
         emit Transfer(address(0), msg.sender, initialSupply);
     }
 
-    function name() public pure returns (string memory) {
+    function name() external pure returns (string memory) {
         return "MedorCoin";
     }
 
-    function symbol() public pure returns (string memory) {
+    function symbol() external pure returns (string memory) {
         return "MEDOR";
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return DECIMALS;
     }
 
-    function transfer(address to, uint256 amount) public returns (bool) {
+    function transfer(address to, uint256 amount) external returns (bool) {
         if (to == address(0)) revert ZeroAddress();
         if (balanceOf[msg.sender] < amount) revert InsufficientBalance();
 
@@ -48,7 +48,7 @@ contract MedorCoin {
         return true;
     }
 
-    function approve(address spender, uint256 amount) public returns (bool) {
+    function approve(address spender, uint256 amount) external returns (bool) {
         if (spender == address(0)) revert ZeroAddress();
 
         allowance[msg.sender][spender] = amount;
@@ -56,7 +56,7 @@ contract MedorCoin {
         return true;
     }
 
-    function transferFrom(address from, address to, uint256 amount) public returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
         if (to == address(0)) revert ZeroAddress();
         if (balanceOf[from] < amount) revert InsufficientBalance();
         if (allowance[from][msg.sender] < amount) revert AllowanceExceeded();
